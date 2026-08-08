@@ -16,6 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const bgInput = document.getElementById('bg-color');
     const versionSelect = document.getElementById('formspec-version');
 
+    // Нові елементи для експорту
+    const exportTypeSelect = document.getElementById('export-type');
+    const bookWrittenFields = document.getElementById('book-written-fields');
+    const bookOwnerInput = document.getElementById('book-owner');
+    const bookDescInput = document.getElementById('book-desc');
+    const bookTextInput = document.getElementById('book-text');
+    const bookTitleInput = document.getElementById('book-title');
+
+    // Показати/сховати поля писаної книги
+    exportTypeSelect.addEventListener('change', () => {
+        if (exportTypeSelect.value === 'book_written') {
+            bookWrittenFields.style.display = 'block';
+        } else {
+            bookWrittenFields.style.display = 'none';
+        }
+    });
+
     // Заповнити палітру
     ELEMENT_TYPES.forEach(typeObj => {
         const div = document.createElement('div');
@@ -42,9 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     canvasHeightInput.addEventListener('input', updateCanvasSize);
     updateCanvasSize();
 
-    // Оновлення масштабу при зміні розміру контейнера (просте)
-    window.addEventListener('resize', updateCanvasSize);
-
     // Drag start з палітри
     function handleDragStart(e) {
         e.dataTransfer.setData('text/plain', e.target.dataset.type);
@@ -61,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = canvasEl.getBoundingClientRect();
         const scaleX = canvasScale;
         const scaleY = canvasScale;
-        // Координати в units
         const x = (e.clientX - rect.left) / scaleX;
         const y = (e.clientY - rect.top) / scaleY;
 
@@ -88,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     btnDelete.addEventListener('click', deleteSelected);
-    // Також клавіша Delete
     document.addEventListener('keydown', e => {
         if (e.key === 'Delete' && selectedId) {
             deleteSelected();
@@ -132,12 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `<input type="text" data-prop="${prop}" value="${value}" onchange="updateProperty(this)">`;
             }
         });
-        // Додаткове поле для zIndex
         html += `<label>zIndex:</label><input type="number" data-prop="zIndex" value="${el.zIndex}" onchange="updateProperty(this)">`;
         propsPanel.innerHTML = html;
     }
 
-    // Функція для оновлення властивості елемента (викликається з onchange)
+    // Оновлення властивості (глобальна функція для onchange)
     window.updateProperty = function(input) {
         if (!selectedId) return;
         const el = elements.find(e => e.id === selectedId);
@@ -146,10 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let val = input.value;
         if (prop === 'zIndex' || prop === 'selected' || prop === 'columns' || prop === 'rows') val = Number(val);
         el[prop] = val;
-        renderAll(); // перемалювати, щоб оновити вигляд на полотні
+        renderAll();
     };
 
-    // Перемалювати полотно
+    // Малювання полотна
     function renderCanvas() {
         canvasEl.innerHTML = '';
         const sorted = [...elements].sort((a,b) => a.zIndex - b.zIndex);
@@ -163,12 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
             div.style.zIndex = el.zIndex;
             div.dataset.id = el.id;
 
-            // Відображення тексту на елементі
             let displayText = el.label || el.text || el.name || el.type;
             if (el.type === 'box') displayText = '';
             div.textContent = displayText;
 
-            // Кнопка швидкого видалення
             const delBtn = document.createElement('span');
             delBtn.className = 'delete-btn';
             delBtn.textContent = '×';
@@ -180,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             div.appendChild(delBtn);
 
-            // Drag елемента на полотні
             div.addEventListener('mousedown', (e) => {
                 if (e.target.classList.contains('delete-btn')) return;
                 e.preventDefault();
@@ -197,12 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const dy = (e.clientY - startY) / scale;
                     el.x = Math.max(0, origLeft + dx);
                     el.y = Math.max(0, origTop + dy);
-                    renderCanvas(); // швидке оновлення позицій
+                    renderCanvas();
                 }
                 function onMouseUp() {
                     document.removeEventListener('mousemove', onMouseMove);
                     document.removeEventListener('mouseup', onMouseUp);
-                    renderAll(); // повне оновлення
+                    renderAll();
                 }
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
@@ -212,23 +220,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Повне оновлення всього інтерфейсу
     function renderAll() {
         renderCanvas();
         updateLayerList();
         updatePropertiesPanel();
     }
 
-    // Генерація formspec
+    // Генерація з урахуванням типу експорту
     btnGenerate.addEventListener('click', () => {
         const w = canvasWidthInput.value;
         const h = canvasHeightInput.value;
         const ver = versionSelect.value;
         const bg = bgInput.value.trim();
-        const code = generateFormspec(elements, w, h, ver, bg);
-        outputArea.value = code;
+        const exportType = exportTypeSelect.value;
+
+        let bookFields = {};
+        if (exportType === 'book_written') {
+            bookFields = {
+                owner: bookOwnerInput.value,
+                desc: bookDescInput.value,
+                text: bookTextInput.value,
+                title: bookTitleInput.value
+            };
+        }
+
+        const result = generateExportString(elements, w, h, ver, bg, exportType, bookFields);
+        outputArea.value = result;
     });
 
-    // Початкове рендерення
+    // Початкове відображення
     renderAll();
 });

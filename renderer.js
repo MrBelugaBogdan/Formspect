@@ -55,6 +55,10 @@ function generateFormspec(elements, canvasWidth, canvasHeight, version, bg) {
             case "list":
                 parts.push(`list[${el.inventory_location};${el.list_name};${x},${y};${el.columns},${el.rows};]`);
                 break;
+            case "playerlist":
+                // інвентар гравця: list[current_player;main;x,y;cols,rows;]
+                parts.push(`list[current_player;main;${x},${y};${el.columns},${el.rows};]`);
+                break;
         }
     }
     return parts.join('');

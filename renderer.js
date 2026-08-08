@@ -1,20 +1,26 @@
+// Допоміжна функція: перетворює рядок на base64 (UTF-8)
+function utf8ToBase64(str) {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(str);
+    let binary = '';
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    return btoa(binary);
+}
+
+// Генерація чистого formspec (без обгорток)
 function generateFormspec(elements, canvasWidth, canvasHeight, version, bg) {
     let parts = [];
     parts.push(`formspec_version[${version}]`);
     parts.push(`size[${canvasWidth},${canvasHeight}]`);
     
-    // Фон
     if (bg) {
         if (bg.startsWith('#')) {
-            // Якщо колір – додаємо background з кольором (повне заповнення)
             parts.push(`bgcolor[${bg};false]`);
         } else {
-            // Якщо текстура – використовуємо background з масштабуванням
             parts.push(`background[-0.5,-0.5;${canvasWidth+1},${canvasHeight+1};${bg};true]`);
         }
     }
 
-    // Сортуємо за zIndex (чим більше, тим пізніше малюється, тобто вище)
     const sorted = [...elements].sort((a,b) => a.zIndex - b.zIndex);
     for (const el of sorted) {
         const x = el.x;
@@ -56,10 +62,49 @@ function generateFormspec(elements, canvasWidth, canvasHeight, version, bg) {
                 parts.push(`list[${el.inventory_location};${el.list_name};${x},${y};${el.columns},${el.rows};]`);
                 break;
             case "playerlist":
-                // інвентар гравця: list[current_player;main;x,y;cols,rows;]
                 parts.push(`list[current_player;main;${x},${y};${el.columns},${el.rows};]`);
                 break;
         }
     }
     return parts.join('');
+}
+
+// Генерація повного рядка для експорту (чистий formspec, books:empty, books:written)
+function generateExportString(elements, canvasWidth, canvasHeight, version, bg, exportType, bookFields = {}) {
+    const formspecStr = generateFormspec(elements, canvasWidth, canvasHeight, version, bg);
+
+    // Символи-роздільники
+    const SOH = '\u0001';
+    const STX = '\u0002';
+    const ETX = '\u0003';
+
+    if (exportType === 'raw') {
+        return formspecStr;
+    } else if (exportType === 'book_empty') {
+        // books:empty – тільки поле formspec
+        return `/giveme books:empty 1 0 "${SOH}formspec${STX}${formspecStr}${ETX}"`;
+    } else if (exportType === 'book_written') {
+        const owner = bookFields.owner || '';
+        const description = bookFields.desc || '';
+        const page = '1';
+        const page_max = '1';
+        const text = bookFields.text || '';
+        const title = bookFields.title || '';
+
+        const textB64 = utf8ToBase64(text);
+        const titleB64 = utf8ToBase64(title);
+
+        // Формуємо рядок за прикладом
+        const data = 
+            `${SOH}owner${STX}${owner}${ETX}` +
+            `description${STX}${description}${ETX}` +
+            `page${STX}${page}${ETX}` +
+            `page_max${STX}${page_max}${ETX}` +
+            `text_b64${STX}${textB64}${ETX}` +
+            `title_b64${STX}${titleB64}${ETX}` +
+            `formspec${STX}${formspecStr}${ETX}`;
+
+        return `/giveme books:written 1 0 "${SOH}${data}"`;
+    }
+    return '';
 }

@@ -29,8 +29,30 @@
             <input type="text" id="bg-color" placeholder="#00000000 або назва текстури" value="">
             <small>Наприклад: #0fc5f7, default_item_bg.png, gui_formbg.png</small>
             <br><br>
-            <button id="btn-generate">📋 Згенерувати formspec</button>
-            <textarea id="output-formspec" readonly rows="10" placeholder="Тут зʼявиться код..."></textarea>
+
+            <!-- Нова секція: Експорт у книгу -->
+            <h3>📦 Експорт у книгу</h3>
+            <label for="export-type">Тип виводу:</label>
+            <select id="export-type">
+                <option value="raw">Тільки formspec</option>
+                <option value="book_empty">/giveme books:empty</option>
+                <option value="book_written">/giveme books:written</option>
+            </select>
+
+            <!-- Поля для books:written (показуються тільки коли вибрано) -->
+            <div id="book-written-fields" style="display: none;">
+                <label>Власник (owner):</label>
+                <input type="text" id="book-owner" value="Деси">
+                <label>Опис (description):</label>
+                <input type="text" id="book-desc" value="Інвентар">
+                <label>Текст сторінки (text):</label>
+                <textarea id="book-text" rows="3">Травон 2 - ржера поль лізна</textarea>
+                <label>Назва (title):</label>
+                <input type="text" id="book-title" value="Крисли Bag">
+            </div>
+
+            <button id="btn-generate">📋 Згенерувати</button>
+            <textarea id="output-formspec" readonly rows="12" placeholder="Тут зʼявиться код..."></textarea>
         </div>
 
         <!-- Полотно (canvas) -->

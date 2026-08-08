@@ -72,9 +72,16 @@ const ELEMENT_TYPES = [
     },
     {
         type: "list",
-        label: "List (інвентар)",
+        label: "List (інвентар блоку)",
         defaults: { x: 0.5, y: 13, width: 9, height: 3, inventory_location: "nodemeta:17014 443 16012", list_name: "main", columns: 9, rows: 3 },
         props: ["x","y","width","height","inventory_location","list_name","columns","rows"],
+        color: false
+    },
+    {
+        type: "playerlist",
+        label: "Player Inventory",
+        defaults: { x: 0.5, y: 17, width: 8, height: 4, columns: 8, rows: 4 },
+        props: ["x","y","width","height","columns","rows"],
         color: false
     }
 ];

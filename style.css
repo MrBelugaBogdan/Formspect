@@ -3,66 +3,112 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 body {
-    font-family: sans-serif;
-    background: #1e1e1e;
-    color: #ddd;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
     height: 100vh;
     overflow: hidden;
 }
+
 #app {
     display: flex;
     height: 100vh;
 }
 
-/* Ліва панель (палітра) */
+/* Ліва панель */
 #palette {
-    width: 280px;
-    background: #2a2a2a;
-    padding: 10px;
+    width: 300px;
+    background: #16213e;
+    padding: 15px;
     overflow-y: auto;
-    border-right: 1px solid #444;
+    border-right: 2px solid #0f3460;
     flex-shrink: 0;
 }
+
 #palette h3 {
-    margin: 10px 0 5px;
-    color: #0fc5f7;
+    margin: 15px 0 10px;
+    color: #e94560;
+    font-size: 16px;
 }
+
+#palette label {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #a0a0a0;
+}
+
+#palette input,
+#palette select,
+#palette textarea {
+    width: 100%;
+    margin-top: 4px;
+    padding: 6px 8px;
+    background: #0f3460;
+    color: #e0e0e0;
+    border: 1px solid #533483;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+#palette textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+#palette small {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #666;
+}
+
+#palette button {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    background: #e94560;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+#palette button:hover {
+    background: #c73652;
+}
+
 #element-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 8px;
 }
+
 .element-item {
-    background: #3a3a3a;
-    border: 1px solid #555;
-    border-radius: 4px;
-    padding: 5px 8px;
+    background: #0f3460;
+    border: 1px solid #533483;
+    border-radius: 6px;
+    padding: 8px 12px;
     cursor: grab;
-    font-size: 14px;
-    color: #eee;
+    font-size: 13px;
+    color: #e0e0e0;
     user-select: none;
+    transition: all 0.2s;
 }
+
+.element-item:hover {
+    background: #1a4a7a;
+    border-color: #e94560;
+}
+
 .element-item:active {
     cursor: grabbing;
-}
-#palette input, #palette select, #palette textarea {
-    width: 100%;
-    margin-top: 4px;
-    padding: 4px;
-    background: #1e1e1e;
-    color: #ddd;
-    border: 1px solid #555;
-}
-#palette button {
-    width: 100%;
-    padding: 6px;
-    margin: 8px 0;
-    background: #0fc5f7;
-    border: none;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
+    transform: scale(0.95);
 }
 
 /* Центральне полотно */
@@ -70,108 +116,160 @@ body {
     flex: 1;
     position: relative;
     overflow: auto;
-    background: #111;
+    background: #1a1a2e;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 #canvas {
     position: relative;
-    background-size: 40px 40px;
-    background-image:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    transform-origin: top left;
+    background-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 30px rgba(233, 69, 96, 0.2);
+    min-width: 400px;
+    min-height: 350px;
+}
+
+#grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-image: 
+        linear-gradient(rgba(83, 52, 131, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83, 52, 131, 0.3) 1px, transparent 1px);
+    z-index: 0;
 }
 
 /* Елементи на полотні */
 .canvas-element {
     position: absolute;
-    border: 1px dashed rgba(255,255,255,0.4);
-    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(233, 69, 96, 0.3);
+    background: rgba(15, 52, 96, 0.5);
     cursor: move;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    color: #fff;
+    font-size: 11px;
+    color: #e0e0e0;
     user-select: none;
     overflow: hidden;
-    box-sizing: border-box;
+    text-align: center;
+    border-radius: 3px;
+    z-index: 1;
 }
+
+.canvas-element:hover {
+    border-color: rgba(233, 69, 96, 0.6);
+    background: rgba(15, 52, 96, 0.7);
+}
+
 .canvas-element.selected {
-    border: 2px solid #0fc5f7;
-    background: rgba(15,197,247,0.15);
-    z-index: 100 !important;
+    border: 2px solid #00ff88 !important;
+    background: rgba(0, 255, 136, 0.15) !important;
+    z-index: 1000 !important;
 }
-.delete-btn {
+
+.canvas-element .delete-btn {
     position: absolute;
     top: 2px;
     right: 2px;
-    width: 16px;
-    height: 16px;
-    background: red;
+    width: 18px;
+    height: 18px;
+    background: #e94560;
     color: white;
     border: none;
     border-radius: 50%;
-    font-size: 10px;
-    line-height: 16px;
+    font-size: 11px;
+    line-height: 18px;
     text-align: center;
     cursor: pointer;
     display: none;
+    z-index: 10;
 }
+
 .canvas-element.selected .delete-btn {
     display: block;
 }
 
-/* Права панель властивостей */
+/* Права панель */
 #properties-panel {
-    width: 260px;
-    background: #2a2a2a;
-    padding: 10px;
+    width: 280px;
+    background: #16213e;
+    padding: 15px;
     overflow-y: auto;
-    border-left: 1px solid #444;
+    border-left: 2px solid #0f3460;
     flex-shrink: 0;
 }
+
+#properties-panel h3 {
+    margin: 10px 0;
+    color: #e94560;
+    font-size: 16px;
+}
+
 #props-content label {
     display: block;
-    margin-top: 8px;
-    font-size: 13px;
-    color: #aaa;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #a0a0a0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
-#props-content input, #props-content select, #props-content textarea {
+
+#props-content input,
+#props-content select,
+#props-content textarea {
     width: 100%;
-    margin-top: 2px;
-    padding: 3px 5px;
-    background: #1e1e1e;
-    color: #ddd;
-    border: 1px solid #555;
+    margin-top: 3px;
+    padding: 6px 8px;
+    background: #0f3460;
+    color: #e0e0e0;
+    border: 1px solid #533483;
+    border-radius: 4px;
+    font-size: 13px;
 }
+
+#props-content textarea {
+    resize: vertical;
+    min-height: 50px;
+}
+
 #layer-list {
     list-style: none;
-    margin-top: 5px;
-}
-#layer-list li {
-    padding: 4px 6px;
-    background: #3a3a3a;
-    border: 1px solid #444;
-    margin-bottom: 3px;
-    cursor: pointer;
-}
-#layer-list li:hover {
-    background: #4a4a4a;
-}
-#layer-list li.active-layer {
-    border-color: #0fc5f7;
-    background: #1f4a5a;
-}
-#btn-delete-selected {
-    width: 100%;
     margin-top: 10px;
-    background: #c0392b;
-    border: none;
-    color: white;
-    padding: 5px;
+}
+
+#layer-list li {
+    padding: 8px 10px;
+    background: #0f3460;
+    border: 1px solid #533483;
+    margin-bottom: 4px;
     cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+#layer-list li:hover {
+    background: #1a4a7a;
+}
+
+#layer-list li.active-layer {
+    border-color: #00ff88;
+    background: #1a3a5a;
+    color: #00ff88;
+}
+
+#output-formspec {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    background: #0a0a1a;
+    color: #00ff88;
+    border: 1px solid #533483;
+    border-radius: 4px;
+    padding: 10px;
+    min-height: 200px;
 }

@@ -9,20 +9,19 @@ function utf8ToBase64(str) {
 function generateFormspec(elements, canvasWidth, canvasHeight, version, bg) {
     let parts = [];
     
-    // Версія і розмір ЗАВЖДИ перші
     parts.push(`formspec_version[${version}]`);
     parts.push(`size[${canvasWidth},${canvasHeight}]`);
     
-    // Фон
     if (bg && bg.trim()) {
         if (bg.startsWith('#')) {
             parts.push(`bgcolor[${bg};false]`);
         } else {
-            parts.push(`background[-0.5,-0.5;${parseFloat(canvasWidth)+1},${parseFloat(canvasHeight)+1};${bg};true]`);
+            const w = parseFloat(canvasWidth) + 1;
+            const h = parseFloat(canvasHeight) + 1;
+            parts.push(`background[-0.5,-0.5;${w},${h};${bg};true]`);
         }
     }
 
-    // Сортуємо за zIndex
     const sorted = [...elements].sort((a, b) => a.zIndex - b.zIndex);
     
     for (const el of sorted) {
@@ -35,47 +34,36 @@ function generateFormspec(elements, canvasWidth, canvasHeight, version, bg) {
             case "label":
                 parts.push(`label[${x},${y};${el.text || ""}]`);
                 break;
-                
             case "hypertext":
                 parts.push(`hypertext[${x},${y};${w},${h};${el.name || 'title'};${el.text || ""}]`);
                 break;
-                
             case "button":
                 parts.push(`button[${x},${y};${w},${h};${el.name};${el.label || ""}]`);
                 break;
-                
             case "button_exit":
                 parts.push(`button_exit[${x},${y};${w},${h};${el.name};${el.label || ""}]`);
                 break;
-                
             case "image":
                 parts.push(`image[${x},${y};${w},${h};${el.texture}]`);
                 break;
-                
             case "item_image_button":
                 parts.push(`item_image_button[${x},${y};${w},${h};${el.item};${el.name};${el.label || ""}]`);
                 break;
-                
             case "box":
                 parts.push(`box[${x},${y};${w},${h};${el.color || "#ffffff"}]`);
                 break;
-                
             case "field":
                 parts.push(`field[${x},${y};${w},${h};${el.name};${el.label || ""};${el.default || ''}]`);
                 break;
-                
             case "textarea":
                 parts.push(`textarea[${x},${y};${w},${h};${el.name};${el.label || ""};${el.default || ''}]`);
                 break;
-                
             case "dropdown":
                 parts.push(`dropdown[${x},${y};${w},${h};${el.name};${el.choices};${el.selected || 1}]`);
                 break;
-                
             case "list":
                 parts.push(`list[${el.inventory_location};${el.list_name};${x},${y};${el.columns},${el.rows};]`);
                 break;
-                
             case "playerlist":
                 parts.push(`list[current_player;main;${x},${y};${el.columns},${el.rows};]`);
                 break;

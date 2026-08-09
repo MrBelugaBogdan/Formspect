@@ -9,67 +9,73 @@
     <div id="app">
         <!-- Бічна панель-палітра -->
         <div id="palette">
-            <h3>Елементи</h3>
-            <div id="element-list">
-                <!-- Динамічно заповнюється з elements.js -->
-            </div>
+            <h3>🎨 Елементи</h3>
+            <div id="element-list"></div>
+            
             <hr>
-            <h3>Налаштування полотна</h3>
-            <label>Розмір (ширина, висота):</label>
-            <input type="number" id="canvas-width" value="10" min="1" max="20" step="0.5">
-            <input type="number" id="canvas-height" value="8" min="1" max="20" step="0.5">
-            <br>
+            <h3>⚙️ Налаштування</h3>
+            
+            <label>Розмір formspec (ширина x висота):</label>
+            <div style="display: flex; gap: 5px;">
+                <input type="number" id="canvas-width" value="8" min="1" max="20" step="0.5" style="width: 60px;">
+                <span>x</span>
+                <input type="number" id="canvas-height" value="9" min="1" max="20" step="0.5" style="width: 60px;">
+            </div>
+            
             <label>Версія formspec:</label>
             <select id="formspec-version">
                 <option value="6">6</option>
                 <option value="7" selected>7</option>
             </select>
+            
+            <label>Фон:</label>
+            <input type="text" id="bg-input" placeholder="колір або текстура" value="default_item_bg.png">
+            <small>Приклад: #0fc5f7, gui_formbg.png, default_item_bg.png</small>
+            
             <hr>
-            <label>Фон (колір або текстура):</label>
-            <input type="text" id="bg-color" placeholder="#00000000 або назва текстури" value="">
-            <small>Наприклад: #0fc5f7, default_item_bg.png, gui_formbg.png</small>
-            <br><br>
-
-            <!-- Нова секція: Експорт у книгу -->
-            <h3>📦 Експорт у книгу</h3>
-            <label for="export-type">Тип виводу:</label>
+            <h3>📦 Експорт</h3>
+            
+            <label>Тип виводу:</label>
             <select id="export-type">
                 <option value="raw">Тільки formspec</option>
                 <option value="book_empty">/giveme books:empty</option>
                 <option value="book_written">/giveme books:written</option>
             </select>
-
-            <!-- Поля для books:written (показуються тільки коли вибрано) -->
-            <div id="book-written-fields" style="display: none;">
-                <label>Власник (owner):</label>
+            
+            <div id="book-fields" style="display: none;">
+                <label>Власник:</label>
                 <input type="text" id="book-owner" value="Деси">
-                <label>Опис (description):</label>
+                <label>Опис:</label>
                 <input type="text" id="book-desc" value="Інвентар">
-                <label>Текст сторінки (text):</label>
-                <textarea id="book-text" rows="3">Травон 2 - ржера поль лізна</textarea>
-                <label>Назва (title):</label>
+                <label>Текст сторінки:</label>
+                <textarea id="book-text" rows="2">Травон 2 - ржера поль лізна</textarea>
+                <label>Назва книги:</label>
                 <input type="text" id="book-title" value="Крисли Bag">
             </div>
-
+            
             <button id="btn-generate">📋 Згенерувати</button>
-            <textarea id="output-formspec" readonly rows="12" placeholder="Тут зʼявиться код..."></textarea>
+            <textarea id="output-formspec" readonly rows="10" placeholder="Тут зʼявиться код..."></textarea>
         </div>
 
-        <!-- Полотно (canvas) -->
+        <!-- Полотно -->
         <div id="canvas-container">
-            <div id="canvas"></div>
+            <div id="canvas">
+                <div id="grid-overlay"></div>
+            </div>
         </div>
 
-        <!-- Панель властивостей (зʼявляється при виділенні) -->
+        <!-- Панель властивостей -->
         <div id="properties-panel">
-            <h3>Властивості</h3>
+            <h3>📝 Властивості</h3>
             <div id="props-content">
-                <p>Виберіть елемент на полотні</p>
+                <p style="color: #888;">Виберіть елемент на полотні</p>
             </div>
             <hr>
-            <h3>Шари (z-order)</h3>
+            <h3>📚 Шари</h3>
             <ul id="layer-list"></ul>
-            <button id="btn-delete-selected">🗑️ Видалити вибраний</button>
+            <button id="btn-delete-selected" style="width: 100%; margin-top: 10px; padding: 8px; background: #c0392b; border: none; color: white; cursor: pointer; border-radius: 4px;">
+                🗑️ Видалити вибраний
+            </button>
         </div>
     </div>
 

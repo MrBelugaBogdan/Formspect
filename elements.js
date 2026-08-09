@@ -6,6 +6,12 @@ const ELEMENT_TYPES = [
         props: ["x", "y", "text"]
     },
     {
+        type: "hypertext",
+        label: "📖 Hypertext",
+        defaults: { x: 0.5, y: 0.5, width: 7, height: 1, name: "title", text: "<global halign=center><b>МЕНЮ</b></global>" },
+        props: ["x", "y", "width", "height", "name", "text"]
+    },
+    {
         type: "button",
         label: "🔘 Button",
         defaults: { x: 0.5, y: 2, width: 4, height: 1, name: "btn", label: "Кнопка" },
@@ -13,7 +19,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: "button_exit",
-        label: "🚪 Button Exit",
+        label: "🚪 Exit Button",
         defaults: { x: 0.5, y: 3.5, width: 4, height: 1, name: "exit", label: "Вийти" },
         props: ["x", "y", "width", "height", "name", "label"]
     },
@@ -26,18 +32,18 @@ const ELEMENT_TYPES = [
     {
         type: "item_image_button",
         label: "💎 Item Button",
-        defaults: { x: 1, y: 7.5, width: 1.5, height: 1.5, item: "default:diamond", name: "buy", label: "Купити" },
+        defaults: { x: 1, y: 7, width: 1.5, height: 1.5, item: "default:diamond", name: "buy", label: "Купити" },
         props: ["x", "y", "width", "height", "item", "name", "label"]
     },
     {
         type: "box",
         label: "📦 Box",
-        defaults: { x: 0.5, y: 1.8, width: 9, height: 0.05, color: "#0fc5f7" },
+        defaults: { x: 0.5, y: 1.8, width: 7, height: 0.05, color: "#0fc5f7" },
         props: ["x", "y", "width", "height", "color"]
     },
     {
         type: "field",
-        label: "📝 Field",
+        label: "✏️ Field",
         defaults: { x: 1, y: 9, width: 5, height: 0.8, name: "input", label: "Введіть:", default: "" },
         props: ["x", "y", "width", "height", "name", "label", "default"]
     },
@@ -61,15 +67,9 @@ const ELEMENT_TYPES = [
     },
     {
         type: "playerlist",
-        label: "👤 Player Inventory",
+        label: "👤 Player Inv",
         defaults: { x: 0.25, y: 5.25, width: 8, height: 4, columns: 8, rows: 4 },
         props: ["x", "y", "width", "height", "columns", "rows"]
-    },
-    {
-        type: "hypertext",
-        label: "📖 Hypertext",
-        defaults: { x: 0.5, y: 0.5, width: 7, height: 1, name: "title", text: "<global halign=center><b>МАГАЗИН</b></global>" },
-        props: ["x", "y", "width", "height", "name", "text"]
     }
 ];
 

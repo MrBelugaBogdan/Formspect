@@ -7,19 +7,19 @@
 </head>
 <body>
     <div id="app">
-        <!-- Бічна панель-палітра -->
+        <!-- Бічна панель -->
         <div id="palette">
-            <h3>🎨 Елементи</h3>
+            <h3>🎨 Елементи (перетягни на полотно)</h3>
             <div id="element-list"></div>
             
             <hr>
             <h3>⚙️ Налаштування</h3>
             
-            <label>Розмір formspec (ширина x висота):</label>
+            <label>Розмір (ширина x висота):</label>
             <div style="display: flex; gap: 5px;">
-                <input type="number" id="canvas-width" value="8" min="1" max="20" step="0.5" style="width: 60px;">
+                <input type="number" id="canvas-width" value="8" min="1" max="20" step="0.5">
                 <span>x</span>
-                <input type="number" id="canvas-height" value="9" min="1" max="20" step="0.5" style="width: 60px;">
+                <input type="number" id="canvas-height" value="9" min="1" max="20" step="0.5">
             </div>
             
             <label>Версія formspec:</label>
@@ -28,9 +28,9 @@
                 <option value="7" selected>7</option>
             </select>
             
-            <label>Фон:</label>
-            <input type="text" id="bg-input" placeholder="колір або текстура" value="default_item_bg.png">
-            <small>Приклад: #0fc5f7, gui_formbg.png, default_item_bg.png</small>
+            <label>Фон (колір або текстура):</label>
+            <input type="text" id="bg-input" placeholder="#00000000 або текстура" value="default_item_bg.png">
+            <small>#0fc5f7 / gui_formbg.png / default_item_bg.png</small>
             
             <hr>
             <h3>📦 Експорт</h3>
@@ -53,14 +53,14 @@
                 <input type="text" id="book-title" value="Крисли Bag">
             </div>
             
-            <button id="btn-generate">📋 Згенерувати</button>
-            <textarea id="output-formspec" readonly rows="10" placeholder="Тут зʼявиться код..."></textarea>
+            <button id="btn-copy">📋 Копіювати в буфер</button>
+            <textarea id="output-formspec" readonly rows="12" placeholder="Код з'явиться тут автоматично..."></textarea>
         </div>
 
         <!-- Полотно -->
         <div id="canvas-container">
-            <div id="canvas">
-                <div id="grid-overlay"></div>
+            <div id="canvas-wrapper">
+                <div id="canvas"></div>
             </div>
         </div>
 
@@ -68,14 +68,12 @@
         <div id="properties-panel">
             <h3>📝 Властивості</h3>
             <div id="props-content">
-                <p style="color: #888;">Виберіть елемент на полотні</p>
+                <p>Виберіть елемент на полотні</p>
             </div>
             <hr>
-            <h3>📚 Шари</h3>
+            <h3>📚 Шари (порядок)</h3>
             <ul id="layer-list"></ul>
-            <button id="btn-delete-selected" style="width: 100%; margin-top: 10px; padding: 8px; background: #c0392b; border: none; color: white; cursor: pointer; border-radius: 4px;">
-                🗑️ Видалити вибраний
-            </button>
+            <button id="btn-delete-selected">🗑️ Видалити вибраний</button>
         </div>
     </div>
 

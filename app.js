@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     let elements = [];
     let selectedId = null;
-    const SCALE = 40; // пікселів на одну одиницю координат
+    const SCALE = 40;
 
     // DOM елементи
     const canvasEl = document.getElementById('canvas');
     const paletteList = document.getElementById('element-list');
     const propsPanel = document.getElementById('props-content');
     const layerList = document.getElementById('layer-list');
-    const btnGenerate = document.getElementById('btn-generate');
     const outputArea = document.getElementById('output-formspec');
     const btnDelete = document.getElementById('btn-delete-selected');
+    const btnCopy = document.getElementById('btn-copy');
     const canvasWidthInput = document.getElementById('canvas-width');
     const canvasHeightInput = document.getElementById('canvas-height');
     const bgInput = document.getElementById('bg-input');
@@ -22,9 +22,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookTextInput = document.getElementById('book-text');
     const bookTitleInput = document.getElementById('book-title');
 
+    // === ФУНКЦІЯ АВТОГЕНЕРАЦІЇ ===
+    function autoGenerate() {
+        const w = canvasWidthInput.value;
+        const h = canvasHeightInput.value;
+        const ver = versionSelect.value;
+        const bg = bgInput.value.trim();
+        const exportType = exportTypeSelect.value;
+
+        let bookFieldsData = {};
+        if (exportType === 'book_written') {
+            bookFieldsData = {
+                owner: bookOwnerInput.value,
+                desc: bookDescInput.value,
+                text: bookTextInput.value,
+                title: bookTitleInput.value
+            };
+        }
+
+        const result = generateExportString(elements, w, h, ver, bg, exportType, bookFieldsData);
+        outputArea.value = result;
+    }
+
     // Показати/сховати поля книги
     exportTypeSelect.addEventListener('change', () => {
         bookFields.style.display = exportTypeSelect.value === 'book_written' ? 'block' : 'none';
+        autoGenerate();
+    });
+
+    // Кнопка копіювання
+    btnCopy.addEventListener('click', () => {
+        outputArea.select();
+        document.execCommand('copy');
+        btnCopy.textContent = '✅ Скопійовано!';
+        setTimeout(() => { btnCopy.textContent = '📋 Копіювати в буфер'; }, 1500);
     });
 
     // Заповнення палітри
@@ -48,10 +79,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const h = parseFloat(canvasHeightInput.value) || 9;
         canvasEl.style.width = (w * SCALE) + 'px';
         canvasEl.style.height = (h * SCALE) + 'px';
+        autoGenerate();
     }
     
     canvasWidthInput.addEventListener('input', updateCanvasSize);
     canvasHeightInput.addEventListener('input', updateCanvasSize);
+    bgInput.addEventListener('input', autoGenerate);
+    versionSelect.addEventListener('change', autoGenerate);
+    bookOwnerInput.addEventListener('input', autoGenerate);
+    bookDescInput.addEventListener('input', autoGenerate);
+    bookTextInput.addEventListener('input', autoGenerate);
+    bookTitleInput.addEventListener('input', autoGenerate);
     updateCanvasSize();
 
     // Drag start
@@ -118,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Панель властивостей
     function updatePropertiesPanel() {
         if (!selectedId) {
-            propsPanel.innerHTML = '<p style="color: #888;">Виберіть елемент на полотні</p>';
+            propsPanel.innerHTML = '<p>Виберіть елемент на полотні</p>';
             return;
         }
         
@@ -128,14 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const typeDef = ELEMENT_TYPES.find(t => t.type === el.type);
         if (!typeDef) return;
         
-        let html = `<strong style="color: #00ff88;">${typeDef.label}</strong><br><br>`;
+        let html = `<strong>${typeDef.label}</strong><br><br>`;
         
         typeDef.props.forEach(prop => {
             let value = el[prop] !== undefined ? el[prop] : '';
             html += `<label>${prop}:</label>`;
             
             if (prop === 'color') {
-                html += `<input type="color" data-prop="${prop}" value="${value}" onchange="updateProperty(this)" style="height: 30px;">`;
+                html += `<input type="color" data-prop="${prop}" value="${value}" onchange="updateProperty(this)" style="height: 28px;">`;
             } else if (prop === 'text' || prop === 'label' || prop === 'default') {
                 html += `<textarea data-prop="${prop}" onchange="updateProperty(this)" rows="2">${value}</textarea>`;
             } else {
@@ -149,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         propsPanel.innerHTML = html;
     }
 
-    // Глобальна функція для onchange
+    // Оновлення властивості
     window.updateProperty = function(input) {
         if (!selectedId) return;
         const el = elements.find(e => e.id === selectedId);
@@ -171,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Малювання полотна
     function renderCanvas() {
-        canvasEl.innerHTML = '<div id="grid-overlay"></div>';
+        canvasEl.innerHTML = '';
         
         const sorted = [...elements].sort((a, b) => a.zIndex - b.zIndex);
         
@@ -185,13 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
             div.style.zIndex = el.zIndex || 0;
             div.dataset.id = el.id;
 
-            // Текст на елементі
             let displayText = el.label || el.text || el.name || el.type;
             if (el.type === 'box') displayText = '';
             if (el.type === 'list' || el.type === 'playerlist') displayText = `📦 ${el.columns}x${el.rows}`;
             div.textContent = displayText;
 
-            // Кнопка видалення
             const delBtn = document.createElement('span');
             delBtn.className = 'delete-btn';
             delBtn.textContent = '×';
@@ -203,7 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             div.appendChild(delBtn);
 
-            // Перетягування
             div.addEventListener('mousedown', (e) => {
                 if (e.target.classList.contains('delete-btn')) return;
                 e.preventDefault();
@@ -220,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el.x = Math.max(0, Math.round((origX + dx) * 10) / 10);
                     el.y = Math.max(0, Math.round((origY + dy) * 10) / 10);
                     renderCanvas();
+                    autoGenerate();
                 }
 
                 function onMouseUp() {
@@ -240,29 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCanvas();
         updateLayerList();
         updatePropertiesPanel();
+        autoGenerate();
     }
-
-    // Генерація
-    btnGenerate.addEventListener('click', () => {
-        const w = canvasWidthInput.value;
-        const h = canvasHeightInput.value;
-        const ver = versionSelect.value;
-        const bg = bgInput.value.trim();
-        const exportType = exportTypeSelect.value;
-
-        let bookFieldsData = {};
-        if (exportType === 'book_written') {
-            bookFieldsData = {
-                owner: bookOwnerInput.value,
-                desc: bookDescInput.value,
-                text: bookTextInput.value,
-                title: bookTitleInput.value
-            };
-        }
-
-        const result = generateExportString(elements, w, h, ver, bg, exportType, bookFieldsData);
-        outputArea.value = result;
-    });
 
     // Початкове відображення
     renderAll();
